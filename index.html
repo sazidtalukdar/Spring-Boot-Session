@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <script>
+        async function login() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+
+            const response = await fetch("http://127.0.0.1:8080/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, password }),
+                credentials: "include"
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                alert(data.message);
+                checkLogin();
+            } else {
+                alert(data.message);
+            }
+        }
+
+        async function checkLogin() {
+            const response = await fetch("http://127.0.0.1:8080/user", {
+                method: "GET",
+                credentials: "include"
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                document.getElementById("name").innerText = "Welcome, " + data.name;
+                document.getElementById("logoutBtn").style.display = "block";
+            } else {
+                document.getElementById("name").innerText = "";
+                document.getElementById("logoutBtn").style.display = "none";
+            }
+        }
+
+        async function logout() {
+            await fetch("http://127.0.0.1:8080/logout", {
+                method: "POST",
+                credentials: "include"
+            });
+            checkLogin();
+        }
+
+        window.onload = checkLogin;
+    </script>
+</head>
+<body>
+    <h2>Login Page</h2>
+    <input type="text" id="username" placeholder="Username" />
+    <input type="password" id="password" placeholder="Password" />
+    <button onclick="login()">Login</button>
+
+    <h3 id="name"></h3>
+    <button id="logoutBtn" onclick="logout()" style="display: none;">Logout</button>
+</body>
+</html>
